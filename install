@@ -1,0 +1,29 @@
+#!/bin/bash
+
+## Editor
+EDITOR = "nano"
+ROOT_PARTITION = "/dev/sda2"
+SWAP_PARTITION = "/dev/sda1"
+
+setup_partion() {
+	mkfs.ext4 ${ROOT_PARTITION}
+	mkswap ${SWAP_PARTITION}
+	swapon ${SWAP_PARTITION}
+
+	mount ${ROOT_PARTITION} /mnt
+}
+
+install_arch() {
+	cat default/mirrorlist > /etc/pacman.d/mirrorlist
+	$EDITOR /etc/pacman.d/mirrorlist
+	pacman -Syy
+
+	pacstrap /mnt base base-devel
+
+	genfstab -p /mnt >> /mnt/etc/fstab
+	$EDITOR /mnt/etc/fstab
+}
+
+echo "ARCHLINUX AUTO INSTALLER"
+setup_partion
+install_arch
